@@ -5,13 +5,14 @@ import './App.css'
 
 function App() {
 
-	const { bookmarks, addBookmark } = useBookmarks()
+	const { bookmarks, addBookmark, fetching } = useBookmarks()
 
   return (
     <div>
       <BookmarkList bookmarks={bookmarks} />
       <br /><br />
       <AddBookmarkForm addBookmark={addBookmark} />
+			{fetching && 'Loading...'}
     </div>
   )
 }

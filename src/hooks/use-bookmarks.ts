@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useSessionStorage } from 'usehooks-ts'
 import type { Bookmark } from '../../types/bookmark'
 
@@ -11,6 +11,7 @@ type NewBookmarkData = {
 export default function useBookmarks() {
 
 	const [bookmarks, setBookmarks] = useSessionStorage<Bookmark[]>('bkmkx', [])
+	const [fetching, setFetching] = useState(false)
 
 	useEffect(() => {
 		// IIFE to avoid async useEffect
@@ -23,10 +24,12 @@ export default function useBookmarks() {
 
 	const fetchBookmarks = async () => {
 		console.log('fetching bookmarks from server')
+		setFetching(true)
 		fetch('/api/list')
 			.then(response => response.json())
 			.then(data => setBookmarks(data))
 			.catch(error => console.error('Error:', error))
+			.finally(() => setFetching(false))
 	}
 
 	const addBookmark = async (data: NewBookmarkData) => {
@@ -42,5 +45,5 @@ export default function useBookmarks() {
 		await fetchBookmarks()
 	}
 
-	return { bookmarks, addBookmark }
+	return { bookmarks, addBookmark, fetching }
 }
