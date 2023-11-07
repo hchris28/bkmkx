@@ -4,32 +4,35 @@ import css from './index.module.css'
 type FormData = {
 	name: '',
 	url: '',
-	tags: []
+	tags: string[]
 }
 
-function AddBookmarkForm() {
+interface AddBookmarkFormProps {
+	addBookmark: (bookmark: FormData) => void	
+}
+
+function AddBookmarkForm({ addBookmark }: AddBookmarkFormProps) {
 
 	const [formData, setFormData] = useState<FormData>({ name: '', url: '', tags: [] })
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setFormData({
-			...formData,
-			[e.target.name]: e.target.value
-		})
+		const { name, value } = e.target
+		if (name === 'tags') {
+			setFormData({
+				...formData,
+				[name]: value.split(',').map(tag => tag.trim())
+			})
+		} else {
+			setFormData({
+				...formData,
+				[name]: value
+			})
+		}
 	}
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		const rawResponse = await fetch('/api/add', {
-			method: 'POST',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify(formData)
-		});
-		const content = await rawResponse.json();
-		console.log(content);
+		addBookmark(formData)
 	}
 
 	return (

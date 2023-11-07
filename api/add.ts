@@ -41,7 +41,8 @@ export default function handler(
   async function run() {
     try {
       await client.connect();
-      const cursor = client.db("bkmkx").collection("bookmarks").insertOne(newBookmark);
+      const collection = client.db("bkmkx").collection("bookmarks");
+			await collection.insertOne(newBookmark);
       return newBookmark;
     } catch (err) {
       return err;

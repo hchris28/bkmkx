@@ -1,23 +1,12 @@
-import { useEffect } from 'react'
-import { useSessionStorage } from 'usehooks-ts'
 import type { Bookmark } from '../../../types/bookmark'
 import BookmarkCard from '../bookmark-card'
 import css from './index.module.css'
 
-function BookmarkList() {
+type BookmarkListProps = {
+	bookmarks: Bookmark[]
+}
 
-	const [bookmarks, setBookmarks] = useSessionStorage('bkmkx', [])
-
-	useEffect(() => {
-		if (!bookmarks || bookmarks.length === 0) {
-			console.log('fetching bookmarks from server')
-			fetch('/api/list')
-				.then(response => response.json())
-				.then(data => setBookmarks(data))
-				.catch(error => console.error('Error:', error))
-		}
-	}, [])
-
+function BookmarkList({ bookmarks }: BookmarkListProps) {
 	return (
 		<div className={css.bookmarkList}>
 			{bookmarks.map((bookmark: Bookmark) => (
