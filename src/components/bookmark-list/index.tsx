@@ -22,7 +22,7 @@ function BookmarkList() {
 		<div className={css.bookmarkList}>
 			{bookmarks.map((bookmark: Bookmark) => (
 				<BookmarkCard 
-					key={bookmark._id} 
+					key={bookmark._id.toString()} 
 					text={bookmark.name} 
 					url={bookmark.link} 
 				/>
