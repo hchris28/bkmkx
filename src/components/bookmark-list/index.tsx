@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useSessionStorage } from 'usehooks-ts'
-import Bookmark from '../bookmark'
+import type { Bookmark } from '../../../types/bookmark'
+import BookmarkCard from '../bookmark-card'
 import css from './index.module.css'
 
 function BookmarkList() {
@@ -20,7 +21,7 @@ function BookmarkList() {
 	return (
 		<div className={css.bookmarkList}>
 			{bookmarks.map((bookmark: Bookmark) => (
-				<Bookmark 
+				<BookmarkCard 
 					key={bookmark._id} 
 					text={bookmark.name} 
 					url={bookmark.link} 

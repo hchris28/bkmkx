@@ -1,11 +1,11 @@
 import css from './index.module.css'
 
-interface BookmarkProps {
+interface BookmarkCardProps {
 	text: string
 	url: string
 }
 
-function Bookmark({ text, url }: BookmarkProps) {
+function BookmarkCard({ text, url }: BookmarkCardProps) {
 	return (
 		<div className={css.bookmark}>
 			<a href={url} target="_blank">{text}</a>
@@ -13,4 +13,4 @@ function Bookmark({ text, url }: BookmarkProps) {
 	)
 }
 
-export default Bookmark
+export default BookmarkCard
