@@ -44,7 +44,7 @@ function App() {
 	})
 
 	useEffect(() => {
-		if (filteredBookmarks.length === 1) {
+		if (uiState.searchActive && filteredBookmarks.length === 1) {
 			window.open(filteredBookmarks[0].link, '_blank')
 			uiState.executeCommand('/reset')
 		}
