@@ -1,0 +1,22 @@
+
+.commandBar {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		padding: .5rem;
+		border: solid 1px #ddd;
+		border-radius: .5rem;
+		width: 30vw;
+
+		&:focus-within {
+			border-color: var(--color-primary);
+		}
+		
+		input {
+			width: 100%;
+			font-size: 1.5rem;
+			border: none;
+			outline: none;
+		}
+}

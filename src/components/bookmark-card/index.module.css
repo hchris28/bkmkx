@@ -1,5 +1,8 @@
 .bookmark {
 	font-weight: 500;
+	border: solid 1px #ddd;
+	border-radius: .5rem;
+	padding: 1rem 1.5rem;
 
 	> a {
 		color: var(--color-link);
