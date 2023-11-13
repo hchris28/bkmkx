@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useSessionStorage } from 'usehooks-ts'
 import type { Bookmark } from '../../types/bookmark'
-
-type NewBookmarkData = {
-	name: '',
-	url: '',
-	tags: string[]
-}
+import type { NewBookmark } from '../../types/new-bookmark'
+import { ObjectId } from 'mongodb'
 
 export default function useBookmarks() {
 
@@ -32,7 +28,7 @@ export default function useBookmarks() {
 			.finally(() => setFetching(false))
 	}
 
-	const addBookmark = async (data: NewBookmarkData) => {
+	const addBookmark = async (data: NewBookmark) => {
 		const response = await fetch('/api/add', {
 			method: 'POST',
 			headers: {
@@ -45,5 +41,13 @@ export default function useBookmarks() {
 		await fetchBookmarks()
 	}
 
-	return { bookmarks, addBookmark, fetching }
+	const editBookmark = async (data: Bookmark) => {
+		// TODO: implement
+	}
+
+	const deleteBookmark = async (_id: ObjectId) => {
+		// TODO: implement
+	}
+
+	return { bookmarks, addBookmark, editBookmark, deleteBookmark, fetching }
 }

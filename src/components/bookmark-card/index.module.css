@@ -1,15 +1,35 @@
 .bookmark {
+	position: relative;
 	font-weight: 500;
 	border: solid 1px #ddd;
 	border-radius: .5rem;
 	padding: 1rem 1.5rem;
+	cursor: pointer;
+}
 
-	> a {
-		color: var(--color-link);
-		text-decoration: none;
+.bookmarkName {
+	color: var(--color-link);
+	margin: 0;
 
-		&:hover {
-			color: var(--color-link-hover);
-		}
+	&:hover {
+		color: var(--color-link-hover);
+	}
+}
+
+.bookmarkActions {
+	position: absolute;
+	top: -.5rem;
+	right: .5rem;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+
+	button {
+		background: #fff;
+		border: solid 1px #ddd;
+		height: 1.5rem;
+		width: 1.5rem;
+		border-radius: 1.5rem;
+		cursor: pointer;
 	}
 }

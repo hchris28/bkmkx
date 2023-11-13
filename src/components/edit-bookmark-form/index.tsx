@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { AppStateContext } from '../../contexts/app-state-context'
+import useBookmarks from '../../hooks/use-bookmarks'
+import toast from "react-hot-toast";
 import css from './index.module.css'
 
 type FormData = {
@@ -7,13 +10,11 @@ type FormData = {
 	tags: string[]
 }
 
-interface AddBookmarkFormProps {
-	addBookmark: (bookmark: FormData) => void	
-}
-
-function AddBookmarkForm({ addBookmark }: AddBookmarkFormProps) {
+function EditBookmarkForm() {
 
 	const [formData, setFormData] = useState<FormData>({ name: '', url: '', tags: [] })
+	const { addFormVisible, executeCommand } = useContext(AppStateContext)
+	const { addBookmark } = useBookmarks()
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
@@ -29,10 +30,16 @@ function AddBookmarkForm({ addBookmark }: AddBookmarkFormProps) {
 			})
 		}
 	}
-
+	
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		addBookmark(formData)
+		executeCommand('/reset')
+		toast.success('Bookmark added!')
+	}
+
+	if (!addFormVisible) {
+		return null
 	}
 
 	return (
@@ -45,4 +52,4 @@ function AddBookmarkForm({ addBookmark }: AddBookmarkFormProps) {
 	)
 }
 
-export default AddBookmarkForm
+export default EditBookmarkForm
