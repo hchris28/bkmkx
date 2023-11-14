@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSessionStorage } from 'usehooks-ts'
 import type { Bookmark } from '../../types/bookmark'
-import type { NewBookmark } from '../../types/new-bookmark'
 import { ObjectId } from 'mongodb'
 
 export default function useBookmarks() {
@@ -28,7 +27,7 @@ export default function useBookmarks() {
 			.finally(() => setFetching(false))
 	}
 
-	const addBookmark = async (data: NewBookmark) => {
+	const addBookmark = async (data: NewBookmarkData) => {
 		const response = await fetch('/api/add', {
 			method: 'POST',
 			headers: {
@@ -41,15 +40,42 @@ export default function useBookmarks() {
 		await fetchBookmarks()
 	}
 
-	const editBookmark = async (data: Bookmark) => {
-		// TODO: implement
-		console.log('editBookmark', data)
+	const updateBookmark = async (data: UpdateBookmarkData) => {
+		const response = await fetch('/api/update', {
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(data)
+		});
+		await response.json()
+		await fetchBookmarks()
+		
 	}
 
 	const deleteBookmark = async (_id: ObjectId) => {
-		// TODO: implement
-		console.log('deleteBookmark', _id)
+		const response = await fetch('/api/delete', {
+			method: 'POST',
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(_id)
+		});
+		await response.json()
+		await fetchBookmarks()
 	}
 
-	return { bookmarks, addBookmark, editBookmark, deleteBookmark, fetching }
+	return { bookmarks, addBookmark, updateBookmark, deleteBookmark, fetching }
+}
+
+export interface NewBookmarkData {
+	name: string,
+	url: string,
+	tags: string[]
+}
+
+export interface UpdateBookmarkData extends NewBookmarkData {
+	_id: ObjectId
 }

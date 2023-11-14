@@ -6,13 +6,22 @@
 	padding: 1rem;
 	background-color: #eee;
 	border-radius: .5rem;
+	width: 30vw;
 
 	input {
 		font-size: 1rem;
 		padding: .5rem;
 		border-radius: .5rem;
 		border: none;
+		width: 100%;
 	}
+}
+
+.buttonContainer {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+	gap: 1rem;
 
 	button {
 		font-size: 1rem;

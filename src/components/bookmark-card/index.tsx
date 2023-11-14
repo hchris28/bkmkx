@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { AppStateContext } from '../../contexts/app-state-context';
-// import useBookmarks from '../../hooks/use-bookmarks';
+import useBookmarks from '../../hooks/use-bookmarks';
 import css from './index.module.css'
 import { ObjectId } from "mongodb";
 
@@ -12,8 +12,8 @@ interface BookmarkCardProps {
 
 function BookmarkCard({ _id, text, url }: BookmarkCardProps) {
 
-	const { editMode } = useContext(AppStateContext)
-	// const { editBookmark, deleteBookmark } = useBookmarks()
+	const { editMode, executeCommand } = useContext(AppStateContext)
+	const { deleteBookmark } = useBookmarks()
 
 	const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		e.stopPropagation()
@@ -24,36 +24,38 @@ function BookmarkCard({ _id, text, url }: BookmarkCardProps) {
 
 	const handleEditClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.stopPropagation()
-		// TODO: show edit form
-		console.log(_id)
+		executeCommand(`/edit ${_id}`)
 	}
 
 	const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.stopPropagation()
-		// TODO: delete bookmark, show toast, reset command
-		console.log(_id)
+		deleteBookmark(_id)
+		executeCommand('/edit')
 	}
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		e.stopPropagation()
 		if (e.key === 'Enter') {
 			window.open(url, '_blank')
 		}
 	}
 
 	return (
-		<div
-			className={css.bookmark}
-			tabIndex={0}
-			onClick={handleClick}
-			onKeyDown={handleKeyDown}
-		>
+		<div className={css.bookmarkContainer}>
 			{editMode && (
 				<div className={css.bookmarkActions}>
 					<button onClick={handleEditClick}>E</button>
 					<button onClick={handleDeleteClick}>X</button>
 				</div>
 			)}
-			<p className={css.bookmarkName}>{text}</p>
+			<div
+				className={css.bookmark}
+				tabIndex={editMode ? -1 : 0}
+				onClick={handleClick}
+				onKeyDown={handleKeyDown}
+			>
+				<p className={css.bookmarkName}>{text}</p>
+			</div>
 		</div>
 	)
 }

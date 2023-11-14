@@ -1,4 +1,5 @@
 import { createContext, useReducer, ReactNode } from "react"
+import { ObjectId } from "mongodb"
 
 interface AppState {
 	command: string
@@ -6,6 +7,7 @@ interface AppState {
 	commandActive: boolean
 	editFormVisible: boolean
 	editFormMode: EditFormMode,
+	editFormId?: ObjectId,
 	showAll: boolean
 	editMode: boolean
 	setCommand: (cmd: string) => void
@@ -24,7 +26,7 @@ const enum ActionType {
 	SetEditMode
 }
 
-const enum EditFormMode {
+export const enum EditFormMode {
 	Add,
 	Edit
 }
@@ -40,6 +42,7 @@ const initialState: AppState = {
 	commandActive: false,
 	editFormVisible: false,
 	editFormMode: EditFormMode.Add,
+	editFormId: undefined,
 	showAll: false,
 	editMode: false,
 	setCommand: () => { },
@@ -55,20 +58,37 @@ const reducer = (state: AppState, action: Action): AppState => {
 				searchActive: action.payload !== "" && !action.payload.startsWith("/"),
 				commandActive: action.payload.startsWith("/"),
 			}
+
 		case ActionType.ShowEditForm:
-			return { ...state, editFormVisible: true }
+			return { 
+				...state, 
+				editFormVisible: action.payload.state, 
+				editFormMode: action.payload.mode, 
+				editFormId: action.payload.editFormId,
+				editMode: false,
+				showAll: false 
+			}
+
 		case ActionType.Reset:
 			return { ...state, ...initialState }
+
 		case ActionType.ShowAll:
-			return { ...state, showAll: true, editMode: false }
+			return { ...state, showAll: true, editMode: false, editFormVisible: false }
+
 		case ActionType.SetEditMode:
-			return { ...state, editMode: action.payload, showAll: action.payload }
+			return { 
+				...state, 
+				editMode: action.payload, 
+				showAll: action.payload, 
+				editFormVisible: false 
+			}
+
 		default:
 			return state
 	}
 }
 
-const AppStateContext = createContext<AppState>(initialState);
+export const AppStateContext = createContext<AppState>(initialState);
 
 const AppStateProvider = ({ children }: AppStateProviderProps) => {
 
@@ -79,9 +99,14 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 	}
 
 	const executeCommand = (cmd: string) => {
+
+		const cmdSegments = cmd.split(" ")
+		cmd = cmdSegments[0]
+		const args = cmdSegments.slice(1)
+
 		switch (cmd) {
 			case "/add":
-				dispatch({ type: ActionType.ShowEditForm, payload: { state: true, mode: EditFormMode.Add } })
+				dispatch({ type: ActionType.ShowEditForm, payload: { state: true, mode: EditFormMode.Add, editFormId: undefined } })
 				break
 			case "/reset":
 				dispatch({ type: ActionType.Reset })
@@ -90,7 +115,11 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 				dispatch({ type: ActionType.ShowAll })
 				break
 			case "/edit":
-				dispatch({ type: ActionType.SetEditMode, payload: true })
+				if (args.length === 0) {
+					dispatch({ type: ActionType.SetEditMode, payload: true })
+				} else {
+					dispatch({ type: ActionType.ShowEditForm, payload: { state: true, mode: EditFormMode.Edit, editFormId: args[0] } })
+				}
 				break
 			default:
 				break
@@ -109,4 +138,3 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 };
 
 export default AppStateProvider
-export { AppStateContext }
