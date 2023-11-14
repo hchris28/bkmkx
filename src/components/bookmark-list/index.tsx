@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { AppStateContext } from '../../contexts/app-state-context'
 import type { Bookmark } from '../../../types/bookmark'
 import BookmarkCard from '../bookmark-card'
@@ -10,7 +10,7 @@ type BookmarkListProps = {
 
 function BookmarkList({ bookmarks }: BookmarkListProps) {
 
-	const { command, searchActive, showAll, executeCommand } = useContext(AppStateContext)
+	const { command, searchActive, showAll } = useContext(AppStateContext)
 	
 	if (!searchActive && !showAll) {
 		return null
@@ -29,13 +29,6 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 
 		return lowerName.includes(lowerSearch) || lowerLink.includes(lowerSearch)
 	})
-
-	useEffect(() => {
-		if (searchActive && filteredBookmarks.length === 1) {
-			window.open(filteredBookmarks[0].link, '_blank')
-			executeCommand('/reset')
-		}
-	}, [filteredBookmarks])
 
 	return (
 		<div className={css.bookmarkList}>
