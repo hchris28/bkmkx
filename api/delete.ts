@@ -31,7 +31,7 @@ export default function handler(
       await client.connect();
       const collection = client.db("bkmkx").collection("bookmarks");
 			await collection.deleteOne({ _id: _id});
-      return;
+      return {};
     } catch (err) {
       return err;
     } finally {
