@@ -24,7 +24,6 @@ function BookmarkCard({ _id, text, url }: BookmarkCardProps) {
 
 	const handleEditClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.stopPropagation()
-		
 		// TODO: show edit form
 		console.log(_id)
 	}
@@ -35,8 +34,19 @@ function BookmarkCard({ _id, text, url }: BookmarkCardProps) {
 		console.log(_id)
 	}
 
+	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'Enter') {
+			window.open(url, '_blank')
+		}
+	}
+
 	return (
-		<div className={css.bookmark} onClick={handleClick}>
+		<div
+			className={css.bookmark}
+			tabIndex={0}
+			onClick={handleClick}
+			onKeyDown={handleKeyDown}
+		>
 			{editMode && (
 				<div className={css.bookmarkActions}>
 					<button onClick={handleEditClick}>E</button>
