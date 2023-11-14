@@ -58,11 +58,11 @@ const reducer = (state: AppState, action: Action): AppState => {
 		case ActionType.ShowEditForm:
 			return { ...state, editFormVisible: true }
 		case ActionType.Reset:
-			return { ...state, command: "", editFormVisible: false, showAll: false }
+			return { ...state, ...initialState }
 		case ActionType.ShowAll:
-			return { ...state, showAll: true }
+			return { ...state, showAll: true, editMode: false }
 		case ActionType.SetEditMode:
-			return { ...state, editMode: action.payload }
+			return { ...state, editMode: action.payload, showAll: action.payload }
 		default:
 			return state
 	}
