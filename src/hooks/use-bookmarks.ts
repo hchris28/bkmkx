@@ -43,10 +43,12 @@ export default function useBookmarks() {
 
 	const editBookmark = async (data: Bookmark) => {
 		// TODO: implement
+		console.log('editBookmark', data)
 	}
 
 	const deleteBookmark = async (_id: ObjectId) => {
 		// TODO: implement
+		console.log('deleteBookmark', _id)
 	}
 
 	return { bookmarks, addBookmark, editBookmark, deleteBookmark, fetching }

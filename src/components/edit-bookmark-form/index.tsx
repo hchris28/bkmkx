@@ -2,18 +2,21 @@ import { useState, useContext } from 'react'
 import { AppStateContext } from '../../contexts/app-state-context'
 import useBookmarks from '../../hooks/use-bookmarks'
 import toast from "react-hot-toast";
+import type { NewBookmark } from '../../../types/new-bookmark'
 import css from './index.module.css'
 
-type FormData = {
-	name: '',
-	url: '',
-	tags: string[]
+interface FormData extends NewBookmark{
 }
 
 function EditBookmarkForm() {
 
+	const { editFormVisible, executeCommand } = useContext(AppStateContext)
+	
+	if (!editFormVisible) {
+		return null
+	}
+
 	const [formData, setFormData] = useState<FormData>({ name: '', url: '', tags: [] })
-	const { addFormVisible, executeCommand } = useContext(AppStateContext)
 	const { addBookmark } = useBookmarks()
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,10 +39,6 @@ function EditBookmarkForm() {
 		addBookmark(formData)
 		executeCommand('/reset')
 		toast.success('Bookmark added!')
-	}
-
-	if (!addFormVisible) {
-		return null
 	}
 
 	return (

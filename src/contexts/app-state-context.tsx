@@ -4,7 +4,8 @@ interface AppState {
 	command: string
 	searchActive: boolean
 	commandActive: boolean
-	addFormVisible: boolean
+	editFormVisible: boolean
+	editFormMode: EditFormMode,
 	showAll: boolean
 	editMode: boolean
 	setCommand: (cmd: string) => void
@@ -15,65 +16,81 @@ interface AppStateProviderProps {
 	children: ReactNode;
 }
 
+const enum ActionType {
+	SetCommand,
+	ShowEditForm,
+	Reset,
+	ShowAll,
+	SetEditMode
+}
+
+const enum EditFormMode {
+	Add,
+	Edit
+}
+
 type Action = {
-	type: "SET_COMMAND" | "SHOW_ADD_FORM" | "RESET" | "SHOW_ALL" | "SET_EDIT_MODE",
+	type: ActionType,
 	payload?: any
+}
+
+const initialState: AppState = {
+	command: "",
+	searchActive: false,
+	commandActive: false,
+	editFormVisible: false,
+	editFormMode: EditFormMode.Add,
+	showAll: false,
+	editMode: false,
+	setCommand: () => { },
+	executeCommand: (cmd: string) => { console.log(cmd) },
 }
 
 const reducer = (state: AppState, action: Action): AppState => {
 	switch (action.type) {
-		case "SET_COMMAND":
-			return { 
-				...state, 
+		case ActionType.SetCommand:
+			return {
+				...state,
 				command: action.payload,
 				searchActive: action.payload !== "" && !action.payload.startsWith("/"),
-				commandActive: action.payload.startsWith("/"), 
+				commandActive: action.payload.startsWith("/"),
 			}
-		case "SHOW_ADD_FORM":
-			return { ...state, addFormVisible: true }
-		case "RESET":
-			return { ...state, command: "", addFormVisible: false, showAll: false }
-		case "SHOW_ALL":
+		case ActionType.ShowEditForm:
+			return { ...state, editFormVisible: true }
+		case ActionType.Reset:
+			return { ...state, command: "", editFormVisible: false, showAll: false }
+		case ActionType.ShowAll:
 			return { ...state, showAll: true }
-		case "SET_EDIT_MODE":
+		case ActionType.SetEditMode:
 			return { ...state, editMode: action.payload }
 		default:
 			return state
 	}
 }
 
-export const AppStateContext = createContext<any>(null);
+const AppStateContext = createContext<AppState>(initialState);
 
 const AppStateProvider = ({ children }: AppStateProviderProps) => {
 
-	const [state, dispatch] = useReducer(reducer, {
-		command: "",
-		searchActive: false,
-		commandActive: false,
-		addFormVisible: false,
-		showAll: false,
-		editMode: false,
-		setCommand: () => { },
-		executeCommand: () => { },
-	})
+	const [state, dispatch] = useReducer(reducer,initialState)
 
 	const setCommand = (cmd: string) => {
-		dispatch({ type: "SET_COMMAND", payload: cmd })
+		dispatch({ type: ActionType.SetCommand, payload: cmd })
 	}
 
 	const executeCommand = (cmd: string) => {
 		switch (cmd) {
 			case "/add":
-				dispatch({ type: "SHOW_ADD_FORM", payload: true })
+				dispatch({ type: ActionType.ShowEditForm, payload: { state: true, mode: EditFormMode.Add } })
 				break
 			case "/reset":
-				dispatch({ type: "RESET" })
+				dispatch({ type: ActionType.Reset })
 				break
 			case "/list":
-				dispatch({ type: "SHOW_ALL" })
+				dispatch({ type: ActionType.ShowAll })
 				break
 			case "/edit":
-				dispatch({ type: "SET_EDIT_MODE", payload: true })
+				dispatch({ type: ActionType.SetEditMode, payload: true })
 				break
 			default:
 				break
@@ -91,4 +108,5 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 	);
 };
 
-export default AppStateProvider;
+export default AppStateProvider
+export { AppStateContext }

@@ -12,29 +12,32 @@ interface BookmarkCardProps {
 
 function BookmarkCard({ _id, text, url }: BookmarkCardProps) {
 
-	const { isEditing } = useContext(AppStateContext)
+	const { editMode } = useContext(AppStateContext)
 	// const { editBookmark, deleteBookmark } = useBookmarks()
 
 	const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
 		e.stopPropagation()
-		if (!isEditing) {
+		if (!editMode) {
 			window.open(url, '_blank')
 		}
 	}
 
 	const handleEditClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.stopPropagation()
+		
 		// TODO: show edit form
+		console.log(_id)
 	}
 
 	const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.stopPropagation()
 		// TODO: delete bookmark, show toast, reset command
+		console.log(_id)
 	}
 
 	return (
 		<div className={css.bookmark} onClick={handleClick}>
-			{isEditing && (
+			{editMode && (
 				<div className={css.bookmarkActions}>
 					<button onClick={handleEditClick}>E</button>
 					<button onClick={handleDeleteClick}>X</button>
