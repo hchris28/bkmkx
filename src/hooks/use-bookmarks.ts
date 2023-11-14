@@ -37,7 +37,7 @@ export default function useBookmarks() {
 			},
 			body: JSON.stringify(data)
 		});
-		await response.json();
+		await response.json()
 		await fetchBookmarks()
 	}
 
