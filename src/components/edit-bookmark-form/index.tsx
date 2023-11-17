@@ -6,7 +6,7 @@ import css from './index.module.css'
 
 interface FormData {
 	name: string
-	url: string
+	link: string
 	tags: string[]
 }
 
@@ -14,7 +14,7 @@ function EditBookmarkForm() {
 
 	const { editFormVisible, editFormMode, editFormId, executeCommand } = useContext(AppStateContext)
 
-	const [formData, setFormData] = useState<FormData>({ name: '', url: '', tags: [] })
+	const [formData, setFormData] = useState<FormData>({ name: '', link: '', tags: [] })
 	const { bookmarks, addBookmark, updateBookmark } = useBookmarks()
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,7 +37,7 @@ function EditBookmarkForm() {
 		if (editFormMode === EditFormMode.Add) {
 			addBookmark({
 				name: formData.name,
-				url: formData.url,
+				link: formData.link,
 				tags: formData.tags,
 			})
 			executeCommand('/reset')
@@ -49,7 +49,7 @@ function EditBookmarkForm() {
 			updateBookmark({ 
 				_id: editFormId,
 				name: formData.name,
-				url: formData.url,
+				link: formData.link,
 				tags: formData.tags,
 			})
 			executeCommand('/edit')
@@ -70,7 +70,7 @@ function EditBookmarkForm() {
 		if (editFormMode === EditFormMode.Add) {
 			setFormData({
 				name: '',
-				url: '',
+				link: '',
 				tags: []
 			})
 		} else if (editFormMode === EditFormMode.Edit && editFormId) {
@@ -78,7 +78,7 @@ function EditBookmarkForm() {
 			if (bookmark) {
 				setFormData({
 					name: bookmark.name,
-					url: bookmark.link,
+					link: bookmark.link,
 					tags: bookmark.tags
 				})
 			}
@@ -92,7 +92,7 @@ function EditBookmarkForm() {
 	return (
 		<form className={css.formContainer} onSubmit={handleSubmit}>
 			<input type="text" name="name" onChange={handleInputChange} value={formData.name} placeholder="Name" />
-			<input type="text" name="url" onChange={handleInputChange} value={formData.url} placeholder="URL" />
+			<input type="text" name="link" onChange={handleInputChange} value={formData.link} placeholder="URL" />
 			<input type="text" name="tags" onChange={handleInputChange} value={formData.tags.join(',')} placeholder="Tags (optional)" />
 			<div className={css.buttonContainer}>
 				<button>{editFormMode === EditFormMode.Add ? "Add" : "Save" } Bookmark</button>

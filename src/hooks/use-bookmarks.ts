@@ -1,13 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useSessionStorage } from 'usehooks-ts'
 import type { Bookmark } from '../../types/bookmark'
 import { ObjectId } from 'mongodb'
+import toast from "react-hot-toast";
 
 export default function useBookmarks() {
 
 	const [bookmarks, setBookmarks] = useSessionStorage<Bookmark[]>('bkmkx', [])
 	const [fetching, setFetching] = useState(false)
-
+	const loadingToastRef = useRef<string>('')
+	
 	useEffect(() => {
 		// IIFE to avoid async useEffect
 		(async () => {
@@ -18,13 +20,17 @@ export default function useBookmarks() {
 	}, [])
 
 	const fetchBookmarks = async () => {
-		console.log('fetching bookmarks from server')
+		if (loadingToastRef.current) return
 		setFetching(true)
+		loadingToastRef.current = toast.loading('Loading bookmarks...')
 		fetch('/api/list')
 			.then(response => response.json())
 			.then(data => setBookmarks(data))
 			.catch(error => console.error('Error:', error))
-			.finally(() => setFetching(false))
+			.finally(() => {
+				setFetching(false)
+				toast.dismiss(loadingToastRef.current)
+			})
 	}
 
 	const addBookmark = async (data: NewBookmarkData) => {
@@ -41,6 +47,7 @@ export default function useBookmarks() {
 	}
 
 	const updateBookmark = async (data: UpdateBookmarkData) => {
+		
 		const response = await fetch('/api/update', {
 			method: 'POST',
 			headers: {
@@ -61,7 +68,7 @@ export default function useBookmarks() {
 				'Accept': 'application/json',
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(_id)
+			body: JSON.stringify({ _id })
 		});
 		await response.json()
 		await fetchBookmarks()
@@ -72,7 +79,7 @@ export default function useBookmarks() {
 
 export interface NewBookmarkData {
 	name: string,
-	url: string,
+	link: string,
 	tags: string[]
 }
 

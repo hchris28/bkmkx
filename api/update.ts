@@ -1,11 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { Bookmark } from '../types/bookmark';
 import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 
 interface UpdateBookmarkRequestBody {
 	_id: ObjectId;
 	name: string;
-	url: string;
+	link: string;
 	tags: string[];
 };
 
@@ -27,24 +26,14 @@ export default function handler(
     }
   });
 
-	const { _id, name, url, tags }: UpdateBookmarkRequestBody = request.body;
-
-	const updatedBookmark : Bookmark = {
-		_id: _id,
-		name: name,
-		link: url,
-		icon: "",
-		order: 0,
-		last_used: new Date(),
-		tags: tags
-	}
+	const { _id, ...data }: UpdateBookmarkRequestBody = request.body;
 
   async function run() {
     try {
       await client.connect();
       const collection = client.db("bkmkx").collection("bookmarks");
-			await collection.updateOne({ _id: _id} , updatedBookmark);
-      return updatedBookmark;
+			await collection.updateOne({ "_id": new ObjectId(_id.toString()) }, { $set: { ...data } });
+      return data;
     } catch (err) {
       return err;
     } finally {

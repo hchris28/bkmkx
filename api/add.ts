@@ -4,7 +4,7 @@ import { MongoClient, ServerApiVersion, ObjectId } from "mongodb";
 
 interface AddBookmarkRequestBody {
 	name: string;
-	url: string;
+	link: string;
 	tags: string[];
 };
 
@@ -26,12 +26,12 @@ export default function handler(
     }
   });
 
-	const { name, url, tags }: AddBookmarkRequestBody = request.body;
+	const { name, link, tags }: AddBookmarkRequestBody = request.body;
 
 	const newBookmark : Bookmark = {
 		_id: new ObjectId(),
 		name: name,
-		link: url,
+		link: link,
 		icon: "",
 		order: 0,
 		last_used: new Date(),
