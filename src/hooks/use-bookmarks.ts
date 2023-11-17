@@ -21,8 +21,9 @@ export default function useBookmarks() {
 
 	const fetchBookmarks = async () => {
 		if (loadingToastRef.current) return
-		setFetching(true)
+		console.log('fetching bookmarks', Date.now())
 		loadingToastRef.current = toast.loading('Loading bookmarks...')
+		setFetching(true)
 		fetch('/api/list')
 			.then(response => response.json())
 			.then(data => setBookmarks(data))
@@ -74,7 +75,7 @@ export default function useBookmarks() {
 		await fetchBookmarks()
 	}
 
-	return { bookmarks, addBookmark, updateBookmark, deleteBookmark, fetching }
+	return { bookmarks, fetching, addBookmark, updateBookmark, deleteBookmark }
 }
 
 export interface NewBookmarkData {
