@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
+import { useEffectOnce } from 'usehooks-ts'
 import useBookmarks from './hooks/use-bookmarks'
 import AppStateProvider from './contexts/app-state-context'
 import CommandBar from './components/command-bar'
@@ -9,11 +10,12 @@ import css from './App.module.css'
 
 function App() {
 
-	const { bookmarks } = useBookmarks()
+	const { bookmarks, fetchBookmarks } = useBookmarks()
 	const commandBarRef = useRef<HTMLInputElement>(null)
 
-	useEffect(() => {
+	useEffectOnce(() => {
 		commandBarRef.current?.focus()
+		fetchBookmarks()
 	})
 
 	return (

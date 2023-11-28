@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useSessionStorage } from 'usehooks-ts'
 import type { Bookmark } from '../../types/bookmark'
 import { ObjectId } from 'mongodb'
@@ -9,19 +9,9 @@ export default function useBookmarks() {
 	const [bookmarks, setBookmarks] = useSessionStorage<Bookmark[]>('bkmkx', [])
 	const [fetching, setFetching] = useState(false)
 	const loadingToastRef = useRef<string>('')
-	
-	useEffect(() => {
-		// IIFE to avoid async useEffect
-		(async () => {
-			if (!bookmarks || bookmarks.length === 0) {
-				await fetchBookmarks()
-			}
-		})()
-	}, [])
 
 	const fetchBookmarks = async () => {
 		if (loadingToastRef.current) return
-		console.log('fetching bookmarks', Date.now())
 		loadingToastRef.current = toast.loading('Loading bookmarks...')
 		setFetching(true)
 		fetch('/api/list')
@@ -75,7 +65,7 @@ export default function useBookmarks() {
 		await fetchBookmarks()
 	}
 
-	return { bookmarks, fetching, addBookmark, updateBookmark, deleteBookmark }
+	return { bookmarks, fetching, fetchBookmarks, addBookmark, updateBookmark, deleteBookmark }
 }
 
 export interface NewBookmarkData {
