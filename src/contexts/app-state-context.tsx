@@ -8,6 +8,7 @@ interface AppState {
 	editFormVisible: boolean
 	editFormMode: EditFormMode,
 	editFormId?: ObjectId,
+	tagFilter?: string,
 	showAll: boolean
 	editMode: boolean
 	setCommand: (cmd: string) => void
@@ -23,6 +24,7 @@ const enum ActionType {
 	ShowEditForm,
 	Reset,
 	ShowAll,
+	ShowTag,
 	SetEditMode
 }
 
@@ -43,6 +45,7 @@ const initialState: AppState = {
 	editFormVisible: false,
 	editFormMode: EditFormMode.Add,
 	editFormId: undefined,
+	tagFilter: undefined,
 	showAll: false,
 	editMode: false,
 	setCommand: () => { },
@@ -60,27 +63,42 @@ const reducer = (state: AppState, action: Action): AppState => {
 			}
 
 		case ActionType.ShowEditForm:
-			return { 
-				...state, 
-				editFormVisible: action.payload.state, 
-				editFormMode: action.payload.mode, 
+			return {
+				...state,
+				editFormVisible: action.payload.state,
+				editFormMode: action.payload.mode,
 				editFormId: action.payload.editFormId,
 				editMode: false,
-				showAll: false 
+				showAll: false
 			}
 
 		case ActionType.Reset:
 			return { ...state, ...initialState }
 
 		case ActionType.ShowAll:
-			return { ...state, showAll: true, editMode: false, editFormVisible: false }
-
-		case ActionType.SetEditMode:
 			return { 
 				...state, 
-				editMode: action.payload, 
-				showAll: action.payload, 
+				tagFilter: undefined,
+				showAll: true, 
+				editMode: false, 
 				editFormVisible: false 
+			}
+
+		case ActionType.ShowTag:
+			return {
+				...state,
+				tagFilter: action.payload,
+				showAll: false,
+				editMode: false,
+				editFormVisible: false
+			}
+
+		case ActionType.SetEditMode:
+			return {
+				...state,
+				editMode: action.payload,
+				showAll: action.payload,
+				editFormVisible: false
 			}
 
 		default:
@@ -92,7 +110,7 @@ export const AppStateContext = createContext<AppState>(initialState);
 
 const AppStateProvider = ({ children }: AppStateProviderProps) => {
 
-	const [state, dispatch] = useReducer(reducer,initialState)
+	const [state, dispatch] = useReducer(reducer, initialState)
 
 	const setCommand = (cmd: string) => {
 		dispatch({ type: ActionType.SetCommand, payload: cmd })
@@ -101,8 +119,13 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 	const executeCommand = (cmd: string) => {
 
 		const cmdSegments = cmd.split(" ")
-		cmd = cmdSegments[0]
-		const args = cmdSegments.slice(1)
+		cmd = cmdSegments.shift() ?? ""
+
+		let args: string[] = []
+		if (cmdSegments.length > 0){
+			const argsRegex = /"[^"]+"|[^\s]+/g	
+			args = cmdSegments.join(" ").match(argsRegex)?.map(e => e.replace(/"(.+)"/, "$1")) ?? []
+		}
 
 		switch (cmd) {
 			case "/add":
@@ -112,7 +135,11 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 				dispatch({ type: ActionType.Reset })
 				break
 			case "/list":
-				dispatch({ type: ActionType.ShowAll })
+				if (args.length === 0) {
+					dispatch({ type: ActionType.ShowAll })
+				} else {
+					dispatch({ type: ActionType.ShowTag, payload: args[0] })
+				}
 				break
 			case "/edit":
 				if (args.length === 0) {

@@ -10,11 +10,7 @@ type BookmarkListProps = {
 
 function BookmarkList({ bookmarks }: BookmarkListProps) {
 
-	const { command, searchActive, showAll } = useContext(AppStateContext)
-	
-	if (!searchActive && !showAll) {
-		return null
-	}
+	const { command, commandActive, tagFilter, searchActive, showAll } = useContext(AppStateContext)
 
 	const filteredBookmarks = bookmarks.filter((bookmark: Bookmark) => {
 		if (showAll) {
@@ -23,11 +19,16 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 		if (!command) {
 			return false
 		}
-		const lowerSearch = command.toLowerCase()
-		const lowerName = bookmark.name.toLowerCase()
-		const lowerLink = bookmark.link.toLowerCase()
-
-		return lowerName.includes(lowerSearch) || lowerLink.includes(lowerSearch)
+		if (commandActive && tagFilter) {
+			return bookmark.tags.includes(tagFilter)
+		}
+		if (searchActive) {
+			const lowerSearch = command.toLowerCase()
+			const lowerName = bookmark.name.toLowerCase()
+			const lowerLink = bookmark.link.toLowerCase()
+	
+			return lowerName.includes(lowerSearch) || lowerLink.includes(lowerSearch)
+		}
 	})
 
 	return (
