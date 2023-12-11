@@ -31,9 +31,21 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 		}
 	})
 
+	const bkmkComareFn = (a: Bookmark, b: Bookmark) => {
+		const normalizedAName = a.name.toLowerCase;
+		const normalizedBName = b.name.toLowerCase;
+		if (normalizedAName === normalizedBName) {
+			return 0
+		}
+		if (normalizedAName < normalizedBName) {
+			return -1
+		}
+		return 1
+	}
+
 	return (
 		<div className={css.bookmarkList}>
-			{filteredBookmarks.map((bookmark: Bookmark) => (
+			{filteredBookmarks.sort(bkmkComareFn).map((bookmark: Bookmark) => (
 				<BookmarkCard 
 					key={bookmark._id.toString()} 
 					_id={bookmark._id}
