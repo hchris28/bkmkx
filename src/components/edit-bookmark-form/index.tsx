@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react'
 import { AppStateContext, EditFormMode } from '../../contexts/app-state-context'
 import useBookmarks from '../../hooks/use-bookmarks'
 import toast from "react-hot-toast";
+import InlineErrorMessage from '../inline-error-message';
 import css from './index.module.css'
 
 interface FormData {
@@ -81,12 +82,26 @@ function EditBookmarkForm() {
 					link: bookmark.link,
 					tags: bookmark.tags
 				})
+			} else {
+				setFormData({
+					name: 'ERROR: Bookmark not found',
+					link: '',
+					tags: []
+				})
 			}
 		}
 	}, [editFormMode, editFormId])
 
 	if (!editFormVisible) {
 		return null
+	}
+
+	if (formData.name === 'ERROR: Bookmark not found') {
+		return (
+			<div className={css.formContainer}>
+				<InlineErrorMessage>Bookmark not found</InlineErrorMessage>
+			</div>
+		)
 	}
 
 	return (

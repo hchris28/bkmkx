@@ -18,6 +18,11 @@
   --color-link-hover: #01a9af;
 	--color-primary: #ff5a5f;
 	--color-secondary: #00a699;
+	--color-error: #ff5a5f;
+	--color-success: #00a699;
+	--color-warning: #f5a623;
+	--color-info: #59f5fa;
+
 }
 
 body {
@@ -38,5 +43,9 @@ body {
     --color-link-hover: #076e70;
 		--color-primary: #ff5a5f;
 		--color-secondary: #00a699;
+		--color-error: #ff5a5f;
+		--color-success: #00a699;
+		--color-warning: #f5a623;
+		--color-info: #59f5fa;
   }
 }
