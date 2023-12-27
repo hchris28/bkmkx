@@ -11,11 +11,17 @@ interface FormData {
 	tags: string[]
 }
 
+const emptyFormData: FormData = {
+	name: '',
+	link: '',
+	tags: []
+}
+
 function EditBookmarkForm() {
 
 	const { editFormVisible, editFormMode, editFormId, executeCommand } = useContext(AppStateContext)
 
-	const [formData, setFormData] = useState<FormData>({ name: '', link: '', tags: [] })
+	const [formData, setFormData] = useState<FormData>(emptyFormData)
 	const { bookmarks, addBookmark, updateBookmark } = useBookmarks()
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +48,7 @@ function EditBookmarkForm() {
 				tags: formData.tags,
 			})
 			executeCommand('/reset')
+			setFormData(emptyFormData)
 			toast.success('Bookmark added!')
 		} else if (editFormMode === EditFormMode.Edit) {
 			if (editFormId === undefined) {
@@ -54,6 +61,7 @@ function EditBookmarkForm() {
 				tags: formData.tags,
 			})
 			executeCommand('/edit')
+			setFormData(emptyFormData)
 			toast.success('Bookmark saved!')
 		}
 	}
@@ -69,11 +77,7 @@ function EditBookmarkForm() {
 
 	useEffect(() => {
 		if (editFormMode === EditFormMode.Add) {
-			setFormData({
-				name: '',
-				link: '',
-				tags: []
-			})
+			setFormData(emptyFormData)
 		} else if (editFormMode === EditFormMode.Edit && editFormId) {
 			const bookmark = bookmarks.find(b => b._id === editFormId)
 			if (bookmark) {
