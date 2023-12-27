@@ -10,7 +10,11 @@ type BookmarkListProps = {
 
 function BookmarkList({ bookmarks }: BookmarkListProps) {
 
-	const { command, commandActive, tagFilter, searchActive, showAll } = useContext(AppStateContext)
+	const { command, commandActive, tagFilter, searchActive, showAll, editFormVisible } = useContext(AppStateContext)
+
+	if (editFormVisible) {
+		return null
+	}
 
 	const bkmkFilterFn = (bookmark: Bookmark) => {
 		if (showAll) {
