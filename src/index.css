@@ -16,7 +16,7 @@
   --color-text: #fff;
   --color-link: #59f5fa;
   --color-link-hover: #01a9af;
-	--color-primary: #ff5a5f;
+	--color-primary: #5aafff;
 	--color-secondary: #00a699;
 	--color-error: #ff5a5f;
 	--color-success: #00a699;
@@ -41,7 +41,7 @@ body {
     --color-text: #213547;
     --color-link: rgb(102, 12, 95);
     --color-link-hover: #076e70;
-		--color-primary: #ff5a5f;
+		--color-primary: #5aafff;
 		--color-secondary: #00a699;
 		--color-error: #ff5a5f;
 		--color-success: #00a699;

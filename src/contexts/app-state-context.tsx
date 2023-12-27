@@ -2,17 +2,19 @@ import { createContext, useReducer, ReactNode } from "react"
 import { ObjectId } from "mongodb"
 
 interface AppState {
-	command: string
-	searchActive: boolean
-	commandActive: boolean
-	editFormVisible: boolean
-	editFormMode: EditFormMode,
-	editFormId?: ObjectId,
-	tagFilter?: string,
-	showAll: boolean
-	editMode: boolean
-	setCommand: (cmd: string) => void
-	executeCommand: (cmd: string) => void
+	command: string							// The command bar input
+	searchActive: boolean				// Whether the command bar input is a search
+	commandActive: boolean			// Whether the command bar input is a command
+	commandIsPending: boolean			// Whether the command is pending
+	commandIsValid?: boolean		// Whether the last issued command was valid
+	editFormVisible: boolean		// Whether the edit form is visible
+	editFormMode: EditFormMode, // Whether the edit form is in add or edit mode
+	editFormId?: ObjectId,			// The id of the item being edited
+	tagFilter?: string,				  // The tag being filtered	
+	showAll: boolean					  // Whether all items should be shown
+	editMode: boolean						// Whether the edit mode is active
+	setCommand: (cmd: string) => void					// Sets the command bar input
+	executeCommand: (cmd: string) => boolean	// Executes a command
 }
 
 interface AppStateProviderProps {
@@ -25,7 +27,8 @@ const enum ActionType {
 	Reset,
 	ShowAll,
 	ShowTag,
-	SetEditMode
+	SetEditMode,
+	SetCommandIssuedState
 }
 
 export const enum EditFormMode {
@@ -42,6 +45,8 @@ const initialState: AppState = {
 	command: "",
 	searchActive: false,
 	commandActive: false,
+	commandIsPending: false,
+	commandIsValid: undefined,
 	editFormVisible: false,
 	editFormMode: EditFormMode.Add,
 	editFormId: undefined,
@@ -49,21 +54,27 @@ const initialState: AppState = {
 	showAll: false,
 	editMode: false,
 	setCommand: () => { },
-	executeCommand: (cmd: string) => { console.log(cmd) },
+	executeCommand: (cmd: string): boolean => { console.log(cmd); return true },
 }
 
 const reducer = (state: AppState, action: Action): AppState => {
+	let newAppState: AppState
 	switch (action.type) {
 		case ActionType.SetCommand:
-			return {
+			const payloadIsCommand = action.payload.startsWith("/")
+			const payloadIsEmpty = action.payload === ""
+			newAppState = {
 				...state,
 				command: action.payload,
-				searchActive: action.payload !== "" && !action.payload.startsWith("/"),
-				commandActive: action.payload.startsWith("/"),
+				searchActive: !payloadIsEmpty && !payloadIsCommand,
+				commandActive: payloadIsCommand,
+				commandIsPending: payloadIsCommand,
+				commandIsValid: undefined
 			}
+			break
 
 		case ActionType.ShowEditForm:
-			return {
+			newAppState = {
 				...state,
 				editFormVisible: action.payload.state,
 				editFormMode: action.payload.mode,
@@ -71,39 +82,54 @@ const reducer = (state: AppState, action: Action): AppState => {
 				editMode: false,
 				showAll: false
 			}
+			break
 
 		case ActionType.Reset:
-			return { ...state, ...initialState }
+			newAppState = { ...state, ...initialState }
+			break
 
 		case ActionType.ShowAll:
-			return { 
-				...state, 
+			newAppState = {
+				...state,
 				tagFilter: undefined,
-				showAll: true, 
-				editMode: false, 
-				editFormVisible: false 
+				showAll: true,
+				editMode: false,
+				editFormVisible: false
 			}
+			break
 
 		case ActionType.ShowTag:
-			return {
+			newAppState = {
 				...state,
 				tagFilter: action.payload,
 				showAll: false,
 				editMode: false,
 				editFormVisible: false
 			}
+			break
 
 		case ActionType.SetEditMode:
-			return {
+			newAppState = {
 				...state,
 				editMode: action.payload,
 				showAll: action.payload,
 				editFormVisible: false
 			}
+			break
+
+		case ActionType.SetCommandIssuedState:
+			newAppState = {
+				...state,
+				commandIsPending: action.payload.isPending,
+				commandIsValid: action.payload.isValid
+			}
+			break
 
 		default:
-			return state
+			newAppState = { ...state }
 	}
+
+	return newAppState
 }
 
 export const AppStateContext = createContext<AppState>(initialState);
@@ -116,16 +142,18 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 		dispatch({ type: ActionType.SetCommand, payload: cmd })
 	}
 
-	const executeCommand = (cmd: string) => {
+	const executeCommand = (cmd: string): boolean => {
 
 		const cmdSegments = cmd.split(" ")
 		cmd = cmdSegments.shift() ?? ""
 
 		let args: string[] = []
-		if (cmdSegments.length > 0){
-			const argsRegex = /"[^"]+"|[^\s]+/g	
+		if (cmdSegments.length > 0) {
+			const argsRegex = /"[^"]+"|[^\s]+/g
 			args = cmdSegments.join(" ").match(argsRegex)?.map(e => e.replace(/"(.+)"/, "$1")) ?? []
 		}
+
+		let commandIsValid = true
 
 		switch (cmd) {
 			case "/add":
@@ -149,8 +177,12 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 				}
 				break
 			default:
-				break
+				commandIsValid = false
 		}
+
+		dispatch({ type: ActionType.SetCommandIssuedState, payload: { isPending: false, isValid: commandIsValid } })
+
+		return commandIsValid;
 	}
 
 	return (

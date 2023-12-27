@@ -10,9 +10,18 @@ type BookmarkListProps = {
 
 function BookmarkList({ bookmarks }: BookmarkListProps) {
 
-	const { command, commandActive, tagFilter, searchActive, showAll, editFormVisible } = useContext(AppStateContext)
+	const { 
+		command, 
+		commandActive, 
+		commandIsPending, 
+		commandIsValid, 
+		tagFilter, 
+		searchActive, 
+		showAll, 
+		editFormVisible 
+	} = useContext(AppStateContext)
 
-	if (editFormVisible) {
+	if (editFormVisible || commandIsPending || (commandActive && !commandIsPending && commandIsValid !== true)) {
 		return null
 	}
 

@@ -1,22 +1,29 @@
-
 .commandBar {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		padding: .5rem;
-		border: solid 1px #ddd;
-		border-radius: .5rem;
-		width: 30vw;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding: .5rem;
+	border: solid 1px #ddd;
+	border-radius: .5rem;
+	width: 30vw;
 
-		&:focus-within {
-			border-color: var(--color-primary);
-		}
-		
-		input {
-			width: 100%;
-			font-size: 1.5rem;
-			border: none;
-			outline: none;
-		}
+	&:focus-within {
+		border-color: var(--color-primary);
+	}
+
+	input {
+		width: 100%;
+		font-size: 1.5rem;
+		border: none;
+		outline: none;
+	}
+}
+
+.commandBarError {
+	background-color: var(--color-error);
+	background-color: var(--color-error);
+	border-radius: .25rem;
+	padding: .25rem .75rem;
+	white-space: nowrap;
 }
