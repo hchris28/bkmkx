@@ -12,7 +12,7 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 
 	const { command, commandActive, tagFilter, searchActive, showAll } = useContext(AppStateContext)
 
-	const filteredBookmarks = bookmarks.filter((bookmark: Bookmark) => {
+	const bkmkFilterFn = (bookmark: Bookmark) => {
 		if (showAll) {
 			return true
 		}
@@ -29,11 +29,12 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 	
 			return lowerName.includes(lowerSearch) || lowerLink.includes(lowerSearch)
 		}
-	})
+	}
 
 	const bkmkComareFn = (a: Bookmark, b: Bookmark) => {
-		const normalizedAName = a.name.toLowerCase;
-		const normalizedBName = b.name.toLowerCase;
+		const normalizedAName = a.name.toLowerCase();
+		const normalizedBName = b.name.toLowerCase();
+		
 		if (normalizedAName === normalizedBName) {
 			return 0
 		}
@@ -43,9 +44,13 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 		return 1
 	}
 
+	const filteredBookmarks = bookmarks
+		.filter(bkmkFilterFn)
+		.sort(bkmkComareFn)
+
 	return (
 		<div className={css.bookmarkList}>
-			{filteredBookmarks.sort(bkmkComareFn).map((bookmark: Bookmark) => (
+			{filteredBookmarks.map((bookmark: Bookmark) => (
 				<BookmarkCard 
 					key={bookmark._id.toString()} 
 					_id={bookmark._id}
