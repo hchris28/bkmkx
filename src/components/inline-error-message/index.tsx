@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
 import css from './index.module.css'
 
-interface BookmarkCardProps {
+interface InlineErrorMessageProps {
 	children: ReactNode
 }
 
-function InlineErrorMessage({ children, ...rest } : BookmarkCardProps) {
+function InlineErrorMessage({ children, ...rest } : InlineErrorMessageProps) {
 	return (
 		<div className={css.inlineErrorMessage} {...rest}>
 			{children}

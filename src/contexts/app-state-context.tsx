@@ -1,12 +1,17 @@
 import { createContext, useReducer, ReactNode } from "react"
 import { ObjectId } from "mongodb"
 
+export const enum CommandState {
+	Empty,
+	Searching,
+	CommandPending,
+	CommandValid,
+	CommandInvalid
+}
+
 interface AppState {
 	command: string							// The command bar input
-	searchActive: boolean				// Whether the command bar input is a search
-	commandActive: boolean			// Whether the command bar input is a command
-	commandIsPending: boolean			// Whether the command is pending
-	commandIsValid?: boolean		// Whether the last issued command was valid
+	commandState: CommandState	// The state of the command bar input
 	editFormVisible: boolean		// Whether the edit form is visible
 	editFormMode: EditFormMode, // Whether the edit form is in add or edit mode
 	editFormId?: ObjectId,			// The id of the item being edited
@@ -43,10 +48,7 @@ type Action = {
 
 const initialState: AppState = {
 	command: "",
-	searchActive: false,
-	commandActive: false,
-	commandIsPending: false,
-	commandIsValid: undefined,
+	commandState: CommandState.Empty,
 	editFormVisible: false,
 	editFormMode: EditFormMode.Add,
 	editFormId: undefined,
@@ -66,10 +68,11 @@ const reducer = (state: AppState, action: Action): AppState => {
 			newAppState = {
 				...state,
 				command: action.payload,
-				searchActive: !payloadIsEmpty && !payloadIsCommand,
-				commandActive: payloadIsCommand,
-				commandIsPending: payloadIsCommand,
-				commandIsValid: undefined
+				commandState: payloadIsEmpty
+					? CommandState.Empty
+					: payloadIsCommand
+						? CommandState.CommandPending
+						: CommandState.Searching,
 			}
 			break
 
@@ -120,8 +123,11 @@ const reducer = (state: AppState, action: Action): AppState => {
 		case ActionType.SetCommandIssuedState:
 			newAppState = {
 				...state,
-				commandIsPending: action.payload.isPending,
-				commandIsValid: action.payload.isValid
+				commandState: action.payload.isPending
+					? CommandState.CommandPending
+					: action.payload.isValid
+						? CommandState.CommandValid
+						: CommandState.CommandInvalid,
 			}
 			break
 
