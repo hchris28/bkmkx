@@ -63,6 +63,11 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 
 	return (
 		<div className={css.bookmarkList}>
+			{(searchActive || commandIsValid) && command.length !== 0 && filteredBookmarks.length === 0 && (
+				<div className={css.noBookmarks}>
+					No bookmarks found
+				</div>
+			)}
 			{filteredBookmarks.map((bookmark: Bookmark) => (
 				<BookmarkCard 
 					key={bookmark._id.toString()} 
