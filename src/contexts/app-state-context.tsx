@@ -12,7 +12,6 @@ export const enum CommandState {
 interface AppState {
 	command: string							// The command bar input
 	commandState: CommandState	// The state of the command bar input
-	editFormVisible: boolean		// Whether the edit form is visible
 	editFormMode: EditFormMode, // Whether the edit form is in add or edit mode
 	editFormId?: ObjectId,			// The id of the item being edited
 	tagFilter?: string,				  // The tag being filtered	
@@ -28,7 +27,7 @@ interface AppStateProviderProps {
 
 const enum ActionType {
 	SetCommand,
-	ShowEditForm,
+	SetEditFormMode,
 	Reset,
 	ShowAll,
 	ShowTag,
@@ -37,6 +36,7 @@ const enum ActionType {
 }
 
 export const enum EditFormMode {
+	Inactive,
 	Add,
 	Edit
 }
@@ -49,8 +49,7 @@ type Action = {
 const initialState: AppState = {
 	command: "",
 	commandState: CommandState.Empty,
-	editFormVisible: false,
-	editFormMode: EditFormMode.Add,
+	editFormMode: EditFormMode.Inactive,
 	editFormId: undefined,
 	tagFilter: undefined,
 	showAll: false,
@@ -76,10 +75,9 @@ const reducer = (state: AppState, action: Action): AppState => {
 			}
 			break
 
-		case ActionType.ShowEditForm:
+		case ActionType.SetEditFormMode:
 			newAppState = {
 				...state,
-				editFormVisible: action.payload.state,
 				editFormMode: action.payload.mode,
 				editFormId: action.payload.editFormId,
 				editMode: false,
@@ -97,7 +95,7 @@ const reducer = (state: AppState, action: Action): AppState => {
 				tagFilter: undefined,
 				showAll: true,
 				editMode: false,
-				editFormVisible: false
+				editFormMode: EditFormMode.Inactive,
 			}
 			break
 
@@ -107,7 +105,7 @@ const reducer = (state: AppState, action: Action): AppState => {
 				tagFilter: action.payload,
 				showAll: false,
 				editMode: false,
-				editFormVisible: false
+				editFormMode: EditFormMode.Inactive,
 			}
 			break
 
@@ -116,7 +114,7 @@ const reducer = (state: AppState, action: Action): AppState => {
 				...state,
 				editMode: action.payload,
 				showAll: action.payload,
-				editFormVisible: false
+				editFormMode: EditFormMode.Inactive,
 			}
 			break
 
@@ -163,7 +161,7 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 
 		switch (cmd) {
 			case "/add":
-				dispatch({ type: ActionType.ShowEditForm, payload: { state: true, mode: EditFormMode.Add, editFormId: undefined } })
+				dispatch({ type: ActionType.SetEditFormMode, payload: { state: true, mode: EditFormMode.Add, editFormId: undefined } })
 				break
 			case "/reset":
 				dispatch({ type: ActionType.Reset })
@@ -179,7 +177,7 @@ const AppStateProvider = ({ children }: AppStateProviderProps) => {
 				if (args.length === 0) {
 					dispatch({ type: ActionType.SetEditMode, payload: true })
 				} else {
-					dispatch({ type: ActionType.ShowEditForm, payload: { state: true, mode: EditFormMode.Edit, editFormId: args[0] } })
+					dispatch({ type: ActionType.SetEditFormMode, payload: { state: true, mode: EditFormMode.Edit, editFormId: args[0] } })
 				}
 				break
 			default:

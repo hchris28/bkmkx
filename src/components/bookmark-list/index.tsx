@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { AppStateContext, CommandState } from '../../contexts/app-state-context'
+import { AppStateContext, CommandState, EditFormMode } from '../../contexts/app-state-context'
 import type { Bookmark } from '../../../types/bookmark'
 import BookmarkCard from '../bookmark-card'
 import css from './index.module.css'
@@ -15,10 +15,10 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 		commandState,
 		tagFilter,
 		showAll,
-		editFormVisible
+		editFormMode,
 	} = useContext(AppStateContext)
 
-	if (editFormVisible 
+	if (editFormMode !== EditFormMode.Inactive 
 		|| commandState === CommandState.CommandPending
 		|| commandState === CommandState.CommandInvalid
 	) {

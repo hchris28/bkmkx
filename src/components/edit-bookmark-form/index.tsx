@@ -19,7 +19,7 @@ const emptyFormData: FormData = {
 
 function EditBookmarkForm() {
 
-	const { editFormVisible, editFormMode, editFormId, executeCommand } = useContext(AppStateContext)
+	const { editFormMode, editFormId, executeCommand } = useContext(AppStateContext)
 
 	const [formData, setFormData] = useState<FormData>(emptyFormData)
 	const { bookmarks, addBookmark, updateBookmark } = useBookmarks()
@@ -96,7 +96,7 @@ function EditBookmarkForm() {
 		}
 	}, [editFormMode, editFormId])
 
-	if (!editFormVisible) {
+	if (editFormMode === EditFormMode.Inactive) {
 		return null
 	}
 
