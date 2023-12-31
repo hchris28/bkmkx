@@ -1,5 +1,6 @@
 import { useState, useContext, useEffect } from 'react'
-import { AppStateContext, EditFormMode } from '../../contexts/app-state-context'
+import { CommandContext, Command } from '../../contexts/command-context'
+import { ObjectId } from "mongodb"
 import useBookmarks from '../../hooks/use-bookmarks'
 import toast from "react-hot-toast";
 import InlineErrorMessage from '../inline-error-message';
@@ -17,12 +18,42 @@ const emptyFormData: FormData = {
 	tags: []
 }
 
+const getEditObjectId = (args: string[]) : ObjectId => {
+	//return new ObjectId(args[0]) // this should work?
+	return args[0] as unknown as ObjectId
+}
+
 function EditBookmarkForm() {
 
-	const { editFormMode, editFormId, executeCommand } = useContext(AppStateContext)
-
+	const { command, commandArgs, executeCommand } = useContext(CommandContext)
 	const [formData, setFormData] = useState<FormData>(emptyFormData)
 	const { bookmarks, addBookmark, updateBookmark } = useBookmarks()
+
+	useEffect(() => {
+		if (command === Command.Add) {
+			setFormData(emptyFormData)
+		} else if (command === Command.Edit && commandArgs.length === 1) {
+			const bookmark = bookmarks.find(b => b._id === getEditObjectId(commandArgs))
+			if (bookmark) {
+				setFormData({
+					name: bookmark.name,
+					link: bookmark.link,
+					tags: bookmark.tags
+				})
+			} else {
+				setFormData({
+					name: 'ERROR: Bookmark not found',
+					link: '',
+					tags: []
+				})
+			}
+		}
+	}, [command, commandArgs, bookmarks])
+
+	const showForm = command === Command.Add || (command === Command.Edit && commandArgs.length === 1)
+	if (!showForm) {
+		return null
+	}
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const { name, value } = e.target
@@ -41,7 +72,7 @@ function EditBookmarkForm() {
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault()
-		if (editFormMode === EditFormMode.Add) {
+		if (command === Command.Add) {
 			addBookmark({
 				name: formData.name,
 				link: formData.link,
@@ -50,12 +81,9 @@ function EditBookmarkForm() {
 			executeCommand('/reset')
 			setFormData(emptyFormData)
 			toast.success('Bookmark added!')
-		} else if (editFormMode === EditFormMode.Edit) {
-			if (editFormId === undefined) {
-				throw new Error('editFormId is undefined')
-			}
-			updateBookmark({ 
-				_id: editFormId,
+		} else if (command === Command.Edit) {
+			updateBookmark({
+				_id: getEditObjectId(commandArgs),
 				name: formData.name,
 				link: formData.link,
 				tags: formData.tags,
@@ -68,36 +96,11 @@ function EditBookmarkForm() {
 
 	const handleCancel = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.stopPropagation()
-		if (editFormMode === EditFormMode.Add) {
+		if (command === Command.Add) {
 			executeCommand('/reset')
-		} else if (editFormMode === EditFormMode.Edit) {
+		} else if (command === Command.Edit) {
 			executeCommand('/edit')
 		}
-	}
-
-	useEffect(() => {
-		if (editFormMode === EditFormMode.Add) {
-			setFormData(emptyFormData)
-		} else if (editFormMode === EditFormMode.Edit && editFormId) {
-			const bookmark = bookmarks.find(b => b._id === editFormId)
-			if (bookmark) {
-				setFormData({
-					name: bookmark.name,
-					link: bookmark.link,
-					tags: bookmark.tags
-				})
-			} else {
-				setFormData({
-					name: 'ERROR: Bookmark not found',
-					link: '',
-					tags: []
-				})
-			}
-		}
-	}, [editFormMode, editFormId])
-
-	if (editFormMode === EditFormMode.Inactive) {
-		return null
 	}
 
 	if (formData.name === 'ERROR: Bookmark not found') {
@@ -114,7 +117,7 @@ function EditBookmarkForm() {
 			<input type="text" name="link" onChange={handleInputChange} value={formData.link} placeholder="URL" />
 			<input type="text" name="tags" onChange={handleInputChange} value={formData.tags.join(',')} placeholder="Tags (optional)" />
 			<div className={css.buttonContainer}>
-				<button>{editFormMode === EditFormMode.Add ? "Add" : "Save" } Bookmark</button>
+				<button>{command === Command.Add ? "Add" : "Save" } Bookmark</button>
 				<button type="button" onClick={handleCancel}>Cancel</button>
 			</div>
 		</form>

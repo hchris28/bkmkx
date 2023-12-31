@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { useEffectOnce } from 'usehooks-ts'
 import useBookmarks from './hooks/use-bookmarks'
-import AppStateProvider from './contexts/app-state-context'
+import CommandProvider from './contexts/command-context'
 import CommandBar from './components/command-bar'
 import BookmarkList from './components/bookmark-list'
 import EditBookmarkForm from './components/edit-bookmark-form'
@@ -19,14 +19,14 @@ function App() {
 	})
 
 	return (
-		<AppStateProvider>
+		<CommandProvider>
 			<div className={css.appRoot}>
 				<CommandBar ref={commandBarRef} />
 				<BookmarkList bookmarks={bookmarks} />
 				<EditBookmarkForm />
 			</div>
 			<Toaster />
-		</AppStateProvider>
+		</CommandProvider>
 	)
 }
 

@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
-import { AppStateContext, CommandState } from '../../contexts/app-state-context'
+import { CommandContext, CommandState } from '../../contexts/command-context'
 import css from './index.module.css'
 
 function CommandBar({ }, ref: React.Ref<HTMLInputElement>) {
 
-	const { command, commandState, executeCommand, setCommand } = useContext(AppStateContext)
+	const { commandSource, commandState, executeCommand, setCommand } = useContext(CommandContext)
 
 	const handleCommandBarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setCommand(e.target.value)
@@ -16,7 +16,7 @@ function CommandBar({ }, ref: React.Ref<HTMLInputElement>) {
 	const handleCommandBarKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		switch (e.key) {
 			case 'Enter':
-				executeCommand(command)
+				executeCommand(commandSource)
 				break
 			case 'Escape':
 				executeCommand('/reset')
@@ -26,7 +26,7 @@ function CommandBar({ }, ref: React.Ref<HTMLInputElement>) {
 
 	return (
 		<div className={css.commandBar}>
-			<input type="text" value={command} onChange={handleCommandBarChange} onKeyDown={handleCommandBarKeyDown} ref={ref} />
+			<input type="text" value={commandSource} onChange={handleCommandBarChange} onKeyDown={handleCommandBarKeyDown} ref={ref} />
 			{commandState === CommandState.CommandInvalid && <div className={css.commandBarError}>Invalid command</div>}
 		</div>
 	)
