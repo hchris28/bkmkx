@@ -3,7 +3,7 @@ import { useEffectOnce } from 'usehooks-ts'
 import useBookmarks from './hooks/use-bookmarks'
 import CommandProvider from './contexts/command-context'
 import CommandBar from './components/command-bar'
-import BookmarkList from './components/bookmark-list'
+import SearchResults from './components/search-results'
 import TagList from './components/tag-list'
 import EditBookmarkForm from './components/edit-bookmark-form'
 import { Toaster } from "react-hot-toast";
@@ -34,7 +34,7 @@ function App() {
 			<div className={css.appRoot}>
 				<CommandBar ref={commandBarRef} />
 				<TagList tags={tags} />
-				<BookmarkList bookmarks={bookmarks} />
+				<SearchResults bookmarks={bookmarks} />
 				<EditBookmarkForm />
 			</div>
 			<Toaster />
