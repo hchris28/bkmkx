@@ -58,6 +58,7 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 		.sort(bkmkComareFn)
 
 	const emptyResults = (commandState === CommandState.FreeText && filteredBookmarks.length === 0)
+		|| (command === Command.List && commandArgs.length === 1 && filteredBookmarks.length === 0)
 
 	return (
 		<div className={css.bookmarkList}>

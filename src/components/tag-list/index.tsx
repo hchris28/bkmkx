@@ -25,7 +25,6 @@ function TagList({ tags }: TagListProps) {
 	}
 
 	const search = commandSegments.slice(1).join(' ')
-
 	const tagFilterFn = (tag: string) => {
 		return tag.toLowerCase().includes(search.toLowerCase())
 	}
@@ -34,7 +33,6 @@ function TagList({ tags }: TagListProps) {
 		.filter(tagFilterFn)
 		.sort()
 	
-
 	const execListTagCommand = (tag: string) => {
 		if (tag.indexOf(' ') !== -1) {
 			tag = `"${tag}"`
@@ -53,6 +51,9 @@ function TagList({ tags }: TagListProps) {
 						onClick={() => execListTagCommand(tag)}
 					>{tag}</button>
 				))}
+				{filteredTags.length === 0 && (
+					<div className={css.noResults}>No matching tags!</div>
+				)}
 			</div>
 		</>
 	)
