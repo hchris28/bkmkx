@@ -1,0 +1,13 @@
+.tagList {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.tag {
+	border: none;
+	border-radius: 0.25rem;
+	background-color: var(--color-secondary);
+	color: #fff;
+	padding: 0.25rem 0.5rem;
+}
