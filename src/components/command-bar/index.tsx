@@ -16,7 +16,9 @@ function CommandBar({ }, ref: React.Ref<HTMLInputElement>) {
 	const handleCommandBarKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		switch (e.key) {
 			case 'Enter':
-				executeCommand(commandSource)
+				if (commandState === CommandState.CommandPending) {
+					executeCommand(commandSource)
+				}
 				break
 			case 'Escape':
 				executeCommand('/reset')
