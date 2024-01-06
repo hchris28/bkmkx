@@ -8,6 +8,13 @@
 	border: none;
 	border-radius: 0.25rem;
 	background-color: var(--color-secondary);
+	border: solid 2px var(--color-secondary);
 	color: #fff;
 	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+}
+
+.tag:hover, .tag:focus {
+	outline: none;
+	border: solid 2px #000;
 }
