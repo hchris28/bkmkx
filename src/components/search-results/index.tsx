@@ -17,21 +17,24 @@ function SearchResults({ bookmarks }: SearchResultsProps) {
 		commandArgs,
 	} = useContext(CommandContext)
 
-	const showList = (commandState === CommandState.FreeText)
-		|| (command === Command.List)
-		|| (command === Command.Edit && commandArgs.length === 0)
-	if (!showList) {
+	const searching: boolean = (commandState === CommandState.FreeText)
+	const listing: boolean = (command === Command.List)
+	const editing: boolean = (command === Command.Edit)
+
+	if (!(searching || listing || editing)) {
 		return null
 	}
 
-
-	const showAll = (command === Command.List || command === Command.Edit) && commandArgs.length === 0
-	const showTag = (command === Command.List || command === Command.Edit) && commandArgs.length === 1
+	// for listing and editing, the default argument is a tag name
+	const hasDefaultArg = commandArgs.some(a => a.type === 'default')
+	const showAll = (listing || editing) && !hasDefaultArg
+	const showTag = (listing || editing) && hasDefaultArg
+	
 	const bkmkFilterFn = (bookmark: Bookmark) => {
 		if (showAll) {
 			return true
 		} else if (showTag) {
-			return bookmark.tags.includes(commandArgs[0])
+			return bookmark.tags.includes(commandArgs[0].value)
 		} else if (commandState === CommandState.FreeText) {
 			const lowerSearch = commandSource.toLowerCase()
 			const lowerName = bookmark.name.toLowerCase()
@@ -68,7 +71,10 @@ function SearchResults({ bookmarks }: SearchResultsProps) {
 					No bookmarks found
 				</div>
 			)}
-			<BookmarkList bookmarks={filteredBookmarks} />
+			<BookmarkList 
+				bookmarks={filteredBookmarks} 
+				filter={(showTag ? commandArgs[0].value : undefined)}
+			/>
 		</div>
 	)
 

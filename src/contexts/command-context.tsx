@@ -16,11 +16,16 @@ export const enum CommandState {
 	CommandInvalid
 }
 
+export interface CommandArg {
+	value: string
+	type: 'default' | 'option'
+}
+
 interface CommandContextState {
 	commandSource: string				// The source input string
 	commandState: CommandState	// The state of the input
 	command: Command						// The active command
-	commandArgs: string[]				// The arguments of the active command
+	commandArgs: CommandArg[]		// The arguments of the active command
 	setCommand: (cmd: string) => void					// Sets the command bar input
 	executeCommand: (cmd: string) => boolean	// Executes a command
 }
@@ -114,10 +119,23 @@ const CommandProvider = ({ children }: CommandProviderProps) => {
 		const cmdSegments = cmd.split(" ")
 		cmd = cmdSegments.shift() ?? ""
 
-		let args: string[] = []
+		let args: CommandArg[] = []
 		if (cmdSegments.length > 0) {
+			// we need re-join the args with spaces, but not the spaces inside quotes
+			// NOTE: is there a better way to do this that doesn't require a regex and re-join?
 			const argsRegex = /"[^"]+"|[^\s]+/g
-			args = cmdSegments.join(" ").match(argsRegex)?.map(e => e.replace(/"(.+)"/, "$1")) ?? []
+			args = cmdSegments.join(" ")
+				.match(argsRegex)
+				?.map(e => {
+					const argValue = e.replace(/"(.+)"/, "$1") // remove quotes
+					const isOption = e.startsWith("-")
+					const cmdArg: CommandArg = {
+						value: isOption ? argValue.substring(1) : argValue,
+						type: isOption ? 'option' : 'default'
+					}
+
+					return cmdArg
+				}) ?? []
 		}
 
 		let commandIsValid = true
