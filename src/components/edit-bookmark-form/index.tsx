@@ -1,5 +1,5 @@
 import { useState, useContext, useEffect } from 'react'
-import { CommandContext, Command } from '../../contexts/command-context'
+import { CommandContext, Command, CommandArg } from '../../contexts/command-context'
 import { ObjectId } from "mongodb"
 import useBookmarks from '../../hooks/use-bookmarks'
 import toast from "react-hot-toast";
@@ -18,14 +18,16 @@ const emptyFormData: FormData = {
 	tags: []
 }
 
-const getEditObjectId = (args: string[]) : ObjectId => {
-	//return new ObjectId(args[0]) // this should work?
-	return args[0] as unknown as ObjectId
+const getEditObjectId = (args: CommandArg[]) : ObjectId => {
+	const idArg = args.find(a => a.switch === 'i')
+
+	//return new ObjectId(idArg?.value[0]) // this should work?
+	return idArg?.value[0] as unknown as ObjectId
 }
 
 function EditBookmarkForm() {
 
-	const { command, commandArgs, executeCommand } = useContext(CommandContext)
+	const { command, commandArgs, executeCommand, commandHistory } = useContext(CommandContext)
 	const [formData, setFormData] = useState<FormData>(emptyFormData)
 	const { bookmarks, addBookmark, updateBookmark } = useBookmarks()
 
@@ -50,7 +52,7 @@ function EditBookmarkForm() {
 		}
 	}, [command, commandArgs, bookmarks])
 
-	const showForm = command === Command.Add || (command === Command.Edit && commandArgs.length === 1)
+	const showForm = command === Command.Add || (command === Command.Edit && commandArgs.some(a => a.switch === 'i'))
 	if (!showForm) {
 		return null
 	}
@@ -99,7 +101,13 @@ function EditBookmarkForm() {
 		if (command === Command.Add) {
 			executeCommand('/reset')
 		} else if (command === Command.Edit) {
-			executeCommand('/edit')
+			if (commandHistory.length > 0) {
+				const lastCommand = commandHistory[commandHistory.length - 1]
+				executeCommand(lastCommand)
+			} else {
+				// this should never happen, but just in case...
+				executeCommand('/edit')
+			}
 		}
 	}
 

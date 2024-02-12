@@ -20,7 +20,8 @@ function TagList({ tags }: TagListProps) {
 	}
 
 	const commandSegments: string[] = commandSource.split(' ')
-	if (commandSegments.length < 2 || commandSegments[0] !== '/list') {
+	const pendingCommand = commandSegments[0]
+	if (commandSegments.length < 2 || !['/list', '/edit'].includes(pendingCommand)) {
 		return null
 	}
 
@@ -37,8 +38,8 @@ function TagList({ tags }: TagListProps) {
 		if (tag.indexOf(' ') !== -1) {
 			tag = `"${tag}"`
 		}
-		setCommand(`/list ${tag}`)
-		executeCommand(`/list ${tag}`)
+		setCommand(`${pendingCommand} ${tag}`)
+		executeCommand(`${pendingCommand} ${tag}`)
 	}
 
 	return (

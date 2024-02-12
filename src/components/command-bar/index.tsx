@@ -17,7 +17,7 @@ function CommandBar({ }, ref: React.Ref<HTMLInputElement>) {
 		switch (e.key) {
 			case 'Enter':
 				if (commandState === CommandState.CommandPending) {
-					executeCommand(commandSource)
+					executeCommand(commandSource, true)
 				}
 				break
 			case 'Escape':

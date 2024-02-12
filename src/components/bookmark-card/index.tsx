@@ -24,7 +24,7 @@ function BookmarkCard({ _id, text, url }: BookmarkCardProps) {
 
 	const handleEditClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
 		e.stopPropagation()
-		executeCommand(`/edit ${_id}`)
+		executeCommand(`/edit -i ${_id}`)
 	}
 
 	const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

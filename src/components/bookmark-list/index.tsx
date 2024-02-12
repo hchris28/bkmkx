@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import type { Bookmark } from '../../../types/bookmark'
-import { CommandContext, Command } from '../../contexts/command-context';
+import { CommandContext } from '../../contexts/command-context';
 import BookmarkCard from '../bookmark-card'
 import css from './index.module.css'
 import classNames from 'classnames/bind';
@@ -15,7 +15,11 @@ type BookmarkListProps = {
 function BookmarkList({ bookmarks, filter }: BookmarkListProps) {
 
 	const { commandArgs } = useContext(CommandContext)
-	const group = commandArgs.some(a => a.type === 'option' && a.value === 'g')
+	const group = commandArgs.some(a => a.type === 'option' && a.switch === 'g')
+
+	if (bookmarks.length === 0) {
+		return null;
+	}
 
 	let tags: string[] = [];
 	if (group) {

@@ -17,8 +17,9 @@ export const enum CommandState {
 }
 
 export interface CommandArg {
-	value: string
-	type: 'default' | 'option'
+	value: string[]
+	type: 'default' | 'option',
+	switch?: string
 }
 
 interface CommandContextState {
@@ -27,7 +28,8 @@ interface CommandContextState {
 	command: Command						// The active command
 	commandArgs: CommandArg[]		// The arguments of the active command
 	setCommand: (cmd: string) => void					// Sets the command bar input
-	executeCommand: (cmd: string) => boolean	// Executes a command
+	executeCommand: (cmd: string, log?: boolean) => boolean	// Executes a command
+	commandHistory: string[]		// The history of commands issued with log = true 
 }
 
 interface CommandProviderProps {
@@ -53,6 +55,7 @@ const initialState: CommandContextState = {
 	commandArgs: [],
 	setCommand: () => { },
 	executeCommand: (cmd: string): boolean => { console.log(cmd); return true },
+	commandHistory: []
 }
 
 const reducer = (state: CommandContextState, action: Action): CommandContextState => {
@@ -81,6 +84,9 @@ const reducer = (state: CommandContextState, action: Action): CommandContextStat
 				command: action.payload.command,
 				commandArgs: action.payload.args,
 				commandState: CommandState.CommandValid,
+				commandHistory : action.payload.log 
+					? [...state.commandHistory, state.commandSource] 
+					: state.commandHistory
 			}
 			break
 
@@ -114,7 +120,7 @@ const CommandProvider = ({ children }: CommandProviderProps) => {
 		dispatch({ type: ActionType.SetCommandSource, payload: cmd })
 	}
 
-	const executeCommand = (cmd: string): boolean => {
+	const executeCommand = (cmd: string, log: boolean = false): boolean => {
 
 		const cmdSegments = cmd.split(" ")
 		cmd = cmdSegments.shift() ?? ""
@@ -124,41 +130,48 @@ const CommandProvider = ({ children }: CommandProviderProps) => {
 			// we need re-join the args with spaces, but not the spaces inside quotes
 			// NOTE: is there a better way to do this that doesn't require a regex and re-join?
 			const argsRegex = /"[^"]+"|[^\s]+/g
-			args = cmdSegments.join(" ")
-				.match(argsRegex)
-				?.map(e => {
-					const argValue = e.replace(/"(.+)"/, "$1") // remove quotes
-					const isOption = e.startsWith("-")
-					const cmdArg: CommandArg = {
-						value: isOption ? argValue.substring(1) : argValue,
-						type: isOption ? 'option' : 'default'
-					}
+			const argsSegments = cmdSegments.join(" ").match(argsRegex) ?? []
 
-					return cmdArg
-				}) ?? []
+			let inOption = false
+			for (let i = 0; i < argsSegments.length; i++) {
+				const segVal = argsSegments[i].replace(/"(.+)"/, "$1") // remove quotes
+				const segIsSwitch = segVal.startsWith("-")
+
+				if (!segIsSwitch && !inOption) {
+					// if it's not a switch and we're not in an option, it's a new default arg
+					args.push({ value: [segVal], type: 'default' })
+				} else if (segIsSwitch) {
+					// if it's a switch, we need to start a new option
+					args.push({ value: [], type: 'option', switch: segVal.substring(1) })
+					inOption = true
+				} else {
+					// if it's not a switch and we're in an option, it's a value for the current option
+					args[args.length - 1].value.push(segVal)
+				}
+			}
 		}
 
 		let commandIsValid = true
 
 		switch (cmd) {
 			case "/add":
-				dispatch({ type: ActionType.SetCommand, payload: { command: Command.Add, args: [] } })
+				dispatch({ type: ActionType.SetCommand, payload: { command: Command.Add, args: [], log } })
 				break
 			case "/reset":
 				dispatch({ type: ActionType.Reset })
 				break
 			case "/list":
 				if (args.length === 0) {
-					dispatch({ type: ActionType.SetCommand, payload: { command: Command.List, args: [] } })
+					dispatch({ type: ActionType.SetCommand, payload: { command: Command.List, args: [], log } })
 				} else {
-					dispatch({ type: ActionType.SetCommand, payload: { command: Command.List, args } })
+					dispatch({ type: ActionType.SetCommand, payload: { command: Command.List, args, log } })
 				}
 				break
 			case "/edit":
 				if (args.length === 0) {
-					dispatch({ type: ActionType.SetCommand, payload: { command: Command.Edit, args: [] } })
+					dispatch({ type: ActionType.SetCommand, payload: { command: Command.Edit, args: [], log } })
 				} else {
-					dispatch({ type: ActionType.SetCommand, payload: { command: Command.Edit, args } })
+					dispatch({ type: ActionType.SetCommand, payload: { command: Command.Edit, args, log } })
 				}
 				break
 			default:

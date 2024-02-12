@@ -19,7 +19,7 @@ function SearchResults({ bookmarks }: SearchResultsProps) {
 
 	const searching: boolean = (commandState === CommandState.FreeText)
 	const listing: boolean = (command === Command.List)
-	const editing: boolean = (command === Command.Edit)
+	const editing: boolean = (command === Command.Edit && !commandArgs.some(a => a.switch === 'i'))
 
 	if (!(searching || listing || editing)) {
 		return null
@@ -34,7 +34,7 @@ function SearchResults({ bookmarks }: SearchResultsProps) {
 		if (showAll) {
 			return true
 		} else if (showTag) {
-			return bookmark.tags.includes(commandArgs[0].value)
+			return bookmark.tags.includes(commandArgs[0].value[0])
 		} else if (commandState === CommandState.FreeText) {
 			const lowerSearch = commandSource.toLowerCase()
 			const lowerName = bookmark.name.toLowerCase()
@@ -63,6 +63,7 @@ function SearchResults({ bookmarks }: SearchResultsProps) {
 
 	const emptyResults = (commandState === CommandState.FreeText && filteredBookmarks.length === 0)
 		|| (command === Command.List && commandArgs.length === 1 && filteredBookmarks.length === 0)
+		|| (command === Command.Edit && commandArgs.length === 1 && filteredBookmarks.length === 0)
 
 	return (
 		<div className={css.bookmarkList}>
@@ -73,7 +74,7 @@ function SearchResults({ bookmarks }: SearchResultsProps) {
 			)}
 			<BookmarkList 
 				bookmarks={filteredBookmarks} 
-				filter={(showTag ? commandArgs[0].value : undefined)}
+				filter={(showTag ? commandArgs[0].value[0] : undefined)}
 			/>
 		</div>
 	)
