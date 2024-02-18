@@ -103,11 +103,9 @@ function EditBookmarkForm() {
 		} else if (command === Command.Edit) {
 			if (commandHistory.length > 0) {
 				const lastCommand = commandHistory[commandHistory.length - 1]
-				console.log('lastCommand', lastCommand)
 				executeCommand(lastCommand)
 			} else {
 				// this should never happen, but just in case...
-				console.error('No command history found')
 				executeCommand('/edit')
 			}
 		}

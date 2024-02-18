@@ -4,7 +4,7 @@ import useBookmarks from './hooks/use-bookmarks'
 import CommandProvider from './contexts/command-context'
 import CommandBar from './components/command-bar'
 import SearchResults from './components/search-results'
-import TagList from './components/tag-list'
+import TagSuggestions from './components/tag-suggestions'
 import EditBookmarkForm from './components/edit-bookmark-form'
 import { Toaster } from "react-hot-toast";
 import css from './App.module.css'
@@ -33,7 +33,7 @@ function App() {
 		<CommandProvider>
 			<div className={css.appRoot}>
 				<CommandBar ref={commandBarRef} />
-				<TagList tags={tags} />
+				<TagSuggestions tags={tags} />
 				<SearchResults bookmarks={bookmarks} />
 				<EditBookmarkForm />
 			</div>
