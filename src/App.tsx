@@ -16,8 +16,10 @@ function App() {
 
 	const tags : string[] = bookmarks.reduce<string[]>((acc, bookmark) => {
 		bookmark.tags.forEach(tag => {
-			if (!acc.includes(tag)) {
-				acc.push(tag)
+			// filter out tag groups
+			const tagSegments = tag.split('/')
+			if (tagSegments[0] && !acc.includes(tagSegments[0])) {
+				acc.push(tagSegments[0])
 			}
 		})
 		return acc

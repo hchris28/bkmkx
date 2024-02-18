@@ -21,19 +21,21 @@ function BookmarkList({ bookmarks, filter }: BookmarkListProps) {
 		return null;
 	}
 
-	let tags: string[] = [];
+	let groups: string[] = [];
 	if (group) {
 		bookmarks.forEach((bookmark: Bookmark) => {
 			bookmark.tags.forEach((tag: string) => {
-				if (tag !== filter && !tags.includes(tag)) {
-					tags.push(tag);
+				const tagSegments = tag.split('/')
+				const tagGroup = tagSegments.length == 2 ? tagSegments[1] : ''
+				if (tag !== filter && tagGroup && !groups.includes(tagGroup)) {
+					groups.push(tagGroup);
 				}
 			})
 		})
 	} else {
-		tags = [filter || ''];
+		groups = [filter || ''];
 	}
-	
+
 	const untaggedBookmarks = group
 		? (
 			bookmarks.filter((bookmark: Bookmark) => {
@@ -41,16 +43,18 @@ function BookmarkList({ bookmarks, filter }: BookmarkListProps) {
 			})
 		)
 		: []
-	
+
+	console.log(filter, bookmarks.length)
+
 	return (
-		<div className={cx( css.bookmarkList, { 'bookmarkListGrouped': group } )}>
-			{tags.sort().map((tag: string) => (
+		<div className={cx(css.bookmarkList, { 'bookmarkListGrouped': group })}>
+			{groups.sort().map((tag: string) => (
 				<section key={tag} className={css.tagGroup}>
 					<h2>{tag}</h2>
 					<div className={css.bookmarkCards}>
 						{bookmarks
 							.filter((bookmark: Bookmark) => {
-								return (tags.length === 1 && tags[0] === '')
+								return (groups.length === 1 && groups[0] === '')
 									|| bookmark.tags.includes(tag)
 							})
 							.map((bookmark: Bookmark) => (
