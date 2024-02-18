@@ -84,7 +84,7 @@ const reducer = (state: CommandContextState, action: Action): CommandContextStat
 				command: action.payload.command,
 				commandArgs: action.payload.args,
 				commandState: CommandState.CommandValid,
-				commandHistory : action.payload.log 
+				commandHistory: action.payload.log 
 					? [...state.commandHistory, state.commandSource] 
 					: state.commandHistory
 			}

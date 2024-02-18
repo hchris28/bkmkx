@@ -39,7 +39,7 @@ function TagList({ tags }: TagListProps) {
 			tag = `"${tag}"`
 		}
 		setCommand(`${pendingCommand} ${tag}`)
-		executeCommand(`${pendingCommand} ${tag}`)
+		executeCommand(`${pendingCommand} ${tag}`, true)
 	}
 
 	return (
