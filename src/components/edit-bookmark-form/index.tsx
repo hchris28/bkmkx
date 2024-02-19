@@ -90,7 +90,8 @@ function EditBookmarkForm() {
 				link: formData.link,
 				tags: formData.tags,
 			})
-			executeCommand('/edit')
+			const lastCommand = commandHistory[commandHistory.length - 1]
+			executeCommand(lastCommand)
 			setFormData(emptyFormData)
 			toast.success('Bookmark saved!')
 		}

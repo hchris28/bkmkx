@@ -72,10 +72,7 @@ function SearchResults({ bookmarks }: SearchResultsProps) {
 					No bookmarks found
 				</div>
 			)}
-			<BookmarkList 
-				bookmarks={filteredBookmarks} 
-				filter={(showTag ? commandArgs[0].value[0] : undefined)}
-			/>
+			<BookmarkList bookmarks={filteredBookmarks} />
 		</div>
 	)
 
