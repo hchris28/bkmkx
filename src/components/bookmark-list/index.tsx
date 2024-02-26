@@ -16,6 +16,7 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 
 	const { commandArgs } = useContext(CommandContext)
 	const listShouldBeGrouped = commandArgs.some(a => a.type === 'option' && a.switch === 'g')
+	const listAll = !commandArgs.some(a => a.type === 'default')
 
 	if (bookmarks.length === 0) {
 		return null;
@@ -26,7 +27,9 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 		bookmarks.forEach((bookmark: Bookmark) => {
 			bookmark.tags.forEach((tag: string) => {
 				const tagSegments = tag.split('/')
-				const tagGroup = tagSegments.length == 2 ? tagSegments[1] : ''
+				const tagGroup = listAll
+					?	tagSegments[0]
+					: tagSegments.length == 2 ? tagSegments[1] : ''
 				if (tagGroup && !groups.includes(tagGroup)) {
 					groups.push(tagGroup);
 				}
@@ -45,6 +48,15 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 		)
 		: []
 
+	const goupFilter = (bookmark: Bookmark, tagGroup: string) => {
+		if (!listShouldBeGrouped)
+			return true
+
+		return listAll
+			? bookmark.tags.some(t => t.startsWith(tagGroup))
+			: bookmark.tags.some(t => t.endsWith('/' + tagGroup))
+	}
+
 	return (
 		<div className={cx(css.bookmarkList, { 'bookmarkListGrouped': listShouldBeGrouped })}>
 			{groups.sort().map((tagGroup: string) => (
@@ -52,7 +64,7 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 					<h2>{tagGroup}</h2>
 					<div className={css.bookmarkCards}>
 						{bookmarks
-							.filter((bookmark: Bookmark) => !listShouldBeGrouped || bookmark.tags.some(t => t.endsWith('/' + tagGroup)))
+							.filter((bookmark: Bookmark) => goupFilter(bookmark, tagGroup))
 							.map((bookmark: Bookmark) => (
 								<BookmarkCard
 									key={bookmark._id.toString()}
