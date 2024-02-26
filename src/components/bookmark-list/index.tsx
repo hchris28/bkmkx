@@ -51,7 +51,7 @@ function BookmarkList({ bookmarks }: BookmarkListProps) {
 	const goupFilter = (bookmark: Bookmark, tagGroup: string) => {
 		if (!listShouldBeGrouped)
 			return true
-
+		
 		return listAll
 			? bookmark.tags.some(t => t.startsWith(tagGroup))
 			: bookmark.tags.some(t => t.endsWith('/' + tagGroup))

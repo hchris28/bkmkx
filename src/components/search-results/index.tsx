@@ -34,7 +34,7 @@ function SearchResults({ bookmarks }: SearchResultsProps) {
 		if (showAll) {
 			return true
 		} else if (showTag) {
-			return bookmark.tags.some((tag) => tag.startsWith(commandArgs[0].value[0]))
+			return bookmark.tags.some((tag) => tag == commandArgs[0].value[0] || tag.startsWith(commandArgs[0].value[0] + '/'))
 		} else if (commandState === CommandState.FreeText) {
 			const lowerSearch = commandSource.toLowerCase()
 			const lowerName = bookmark.name.toLowerCase()
